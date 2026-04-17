@@ -3,87 +3,575 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Websi3 | Senior Penetration Tester | Bug Bounty Hunter</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Websi3 | Senior Penetration Tester</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- EmailJS - WILL BE INITIALIZED SAFELY -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <style>
+        /* ======================
+           COMPLETE CSS (এখানেই)
+        ====================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-bg: #0a0e17;
+            --darker-bg: #070a12;
+            --card-bg: rgba(18, 25, 40, 0.7);
+            --accent: #00f0ff;
+            --accent-secondary: #ff2a6d;
+            --text-primary: #e6e6e6;
+            --text-secondary: #a0a0a0;
+            --glass-bg: rgba(25, 35, 60, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-backdrop: blur(12px);
+            --section-padding: 5rem 2rem;
+            --container-width: 1200px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--accent);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        /* Cursor */
+        .cursor-follower {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9998;
+            transition: transform 0.1s ease;
+        }
+
+        /* Particles */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Container */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: var(--section-padding);
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: var(--dark-bg);
+        }
+
+        .btn.primary:hover {
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn.secondary:hover {
+            background: var(--accent);
+            color: var(--dark-bg);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .name {
+            margin-bottom: 1.5rem;
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .letter {
+            display: inline-block;
+            opacity: 0;
+            animation: letterFadeIn 0.5s forwards;
+        }
+
+        @keyframes letterFadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .letter:nth-child(1) { animation-delay: 0.1s; }
+        .letter:nth-child(2) { animation-delay: 0.2s; }
+        .letter:nth-child(3) { animation-delay: 0.3s; }
+        .letter:nth-child(4) { animation-delay: 0.4s; }
+        .letter:nth-child(5) { animation-delay: 0.5s; }
+        .letter:nth-child(6) { animation-delay: 0.6s; }
+        .letter:nth-child(7) { animation-delay: 0.7s; }
+        .letter:nth-child(8) { animation-delay: 0.8s; }
+        .letter:nth-child(9) { animation-delay: 0.9s; }
+        .letter:nth-child(10) { animation-delay: 1.0s; }
+        .letter:nth-child(11) { animation-delay: 1.1s; }
+
+        .tagline {
+            font-size: 1.8rem;
+            margin-bottom: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 8s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0.1; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        /* About */
+        .about {
+            background: var(--darker-bg);
+        }
+
+        .bio {
+            margin-bottom: 3rem;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+            left: 50%;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            top: 0;
+            left: 50%;
+            margin-left: -10px;
+            border: 3px solid var(--dark-bg);
+        }
+
+        .timeline-content {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-backdrop);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 45%;
+            margin-left: 55%;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 0;
+            margin-right: 55%;
+        }
+
+        /* Skills */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .skill-category {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-backdrop);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .skill-category h3 {
+            margin-bottom: 1.8rem;
+            color: var(--accent);
+        }
+
+        .skill-item {
+            margin-bottom: 1.8rem;
+        }
+
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.6rem;
+        }
+
+        .skill-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-progress {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            width: 0;
+            transition: width 1.5s ease;
+        }
+
+        .tools-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .tool-badge {
+            background: rgba(0, 240, 255, 0.15);
+            color: var(--accent);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Projects */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            position: relative;
+            height: 350px;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .project-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.85;
+        }
+
+        .project-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(10, 14, 23, 0.9) 0%, transparent 100%);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .project-card:hover .project-overlay {
+            transform: translateY(0);
+        }
+
+        .project-overlay h3 {
+            color: white;
+            margin-bottom: 0.8rem;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .project-tech span {
+            background: rgba(0, 240, 255, 0.2);
+            color: var(--accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        /* Tools List */
+        .tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2.5rem;
+        }
+
+        .tool-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+        }
+
+        .tool-icon i {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        /* Contact */
+        .contact-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-item i {
+            font-size: 1.5rem;
+            color: var(--accent);
+            width: 30px;
+        }
+
+        .contact-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        footer {
+            padding: 2.5rem 0;
+            background: var(--darker-bg);
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .name { font-size: 2.5rem; }
+            .tagline { font-size: 1.2rem; }
+            .timeline-content { width: 80%; margin-left: 20% !important; }
+            .timeline::before { left: 20px; }
+            .timeline-dot { left: 20px; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
     <div class="loading-screen">
         <div class="spinner"></div>
         <h1 class="loading-text">SECURITY SCAN IN PROGRESS...</h1>
     </div>
 
-    <!-- Cursor Follower -->
     <div class="cursor-follower"></div>
-
-    <!-- Background Particles -->
     <div class="particles-container"></div>
 
-    <!-- Main Content -->
-    <main id="main-content">
-        <!-- Hero Section -->
+    <main>
         <section class="hero" id="home">
             <div class="hero-content">
                 <h1 class="name">
-                    <span class="letter">J</span>
-                    <span class="letter">U</span>
-                    <span class="letter">B</span>
-                    <span class="letter">A</span>
-                    <span class="letter">I</span>
-                    <span class="letter">D</span>
-                    <span class="letter">&nbsp;</span>
-                    <span class="letter">H</span>
-                    <span class="letter">O</span>
-                    <span class="letter">S</span>
-                    <span class="letter">S</span>
-                    <span class="letter">A</span>
-                    <span class="letter">I</span>
-                    <span class="letter">N</span>
+                    <span class="letter">W</span><span class="letter">E</span><span class="letter">B</span><span class="letter">S</span><span class="letter">I</span><span class="letter">3</span>
                 </h1>
-                <p class="tagline">Senior Penetration Tester | Bug Bounty Hunter | Red Team Operator</p>
+                <p class="tagline">Senior Penetration Tester & Bug Bounty Hunter</p>
                 <div class="cta-buttons">
-                    <a href="#projects" class="btn primary">View Exploits</a>
-                    <a href="#contact" class="btn secondary">Hire Me</a>
+                    <a href="#projects" class="btn primary">View Projects</a>
+                    <a href="#contact" class="btn secondary">Get In Touch</a>
                 </div>
             </div>
             <div class="hero-glow"></div>
         </section>
 
-        <!-- About Section -->
         <section class="about" id="about">
             <div class="container">
-                <h2 class="section-title">$ whoami</h2>
+                <h2 class="section-title">About Me</h2>
                 <div class="about-content">
                     <div class="bio">
-                        <p>🔐 <strong>Offensive Security Specialist</strong> with 8+ years of experience breaking into enterprise systems (ethically). I don't just find vulnerabilities — I chain them into full compromises.</p>
-                        <p>🏆 <strong>HackerOne Top 1%</strong> | <strong>Hall of Fame:</strong> Google, Microsoft, PayPal, Shopify</p>
-                        <p>📜 <strong>Certifications:</strong> OSCP | OSWE | CRTO | PNPT</p>
-                        <p>💰 <strong>$250K+</strong> in bug bounties earned since 2016</p>
+                        <p>With over 8 years of experience in offensive security, I specialize in identifying critical vulnerabilities in complex systems.</p>
+                        <p>HackerOne Top 1% | $250K+ bounties | OSCP | OSWE</p>
                     </div>
                     <div class="timeline">
                         <div class="timeline-item">
                             <div class="timeline-dot"></div>
                             <div class="timeline-content">
-                                <h3>Lead Red Team Operator</h3>
-                                <p>CyberShield Inc. | 2022 - Present</p>
+                                <h3>Lead Security Consultant</h3>
+                                <p>CyberShield Inc. | 2020 - Present</p>
                             </div>
                         </div>
                         <div class="timeline-item">
                             <div class="timeline-dot"></div>
                             <div class="timeline-content">
                                 <h3>Senior Penetration Tester</h3>
-                                <p>SecureNet Solutions | 2018 - 2022</p>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <h3>Bug Bounty Hunter</h3>
-                                <p>HackerOne Top 1% | 2016 - Present</p>
+                                <p>SecureNet Solutions | 2017 - 2020</p>
                             </div>
                         </div>
                     </div>
@@ -91,373 +579,112 @@
             </div>
         </section>
 
-        <!-- Skills Section -->
-        <section class="skills" id="skills">
-            <div class="container">
-                <h2 class="section-title">Technical Arsenal</h2>
-                <div class="skills-grid">
-                    <div class="skill-category">
-                        <h3>Penetration Testing</h3>
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span>Web App Security</span>
-                                <span>98%</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-value="98"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span>Network Pentesting</span>
-                                <span>95%</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-value="95"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span>Active Directory</span>
-                                <span>92%</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-value="92"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span>Mobile (iOS/Android)</span>
-                                <span>85%</span>
-                            </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-value="85"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="skill-category">
-                        <h3>Tools & Frameworks</h3>
-                        <div class="tools-grid">
-                            <div class="tool-badge">Metasploit</div>
-                            <div class="tool-badge">Burp Suite</div>
-                            <div class="tool-badge">Cobalt Strike</div>
-                            <div class="tool-badge">BloodHound</div>
-                            <div class="tool-badge">Nmap</div>
-                            <div class="tool-badge">SQLMap</div>
-                            <div class="tool-badge">John/Hashcat</div>
-                            <div class="tool-badge">Mimikatz</div>
-                        </div>
-                    </div>
-                    
-                    <div class="skill-category">
-                        <h3>Programming</h3>
-                        <div class="tools-grid">
-                            <div class="tool-badge">Python</div>
-                            <div class="tool-badge">Bash/PowerShell</div>
-                            <div class="tool-badge">JavaScript/Node.js</div>
-                            <div class="tool-badge">Ruby</div>
-                            <div class="tool-badge">Go</div>
-                            <div class="tool-badge">C/C++</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Projects Section - REAL PROJECTS -->
         <section class="projects" id="projects">
             <div class="container">
-                <h2 class="section-title">/exploits — Recent CVEs & Write-ups</h2>
+                <h2 class="section-title">Featured Projects</h2>
                 <div class="projects-grid">
                     <div class="project-card">
                         <div class="project-overlay">
-                            <h3>CVE-2024-XXXX: RCE in FinTech API</h3>
-                            <p>Pre-auth Remote Code Execution via JWT injection. $15,000 bounty.</p>
-                            <div class="project-tech">
-                                <span>JWT</span>
-                                <span>RCE</span>
-                                <span>API Security</span>
-                            </div>
-                            <a href="#" style="color:#00f0ff; margin-top:10px; display:inline-block;">Read Write-up →</a>
+                            <h3>Financial Institution Pentest</h3>
+                            <p>Discovered critical RCE vulnerability affecting 2M+ users</p>
+                            <div class="project-tech"><span>Web App</span><span>API Testing</span></div>
                         </div>
                         <div class="project-bg" style="background: linear-gradient(135deg, #1a2a6c, #b21f1f);"></div>
                     </div>
-                    
                     <div class="project-card">
                         <div class="project-overlay">
-                            <h3>Microsoft Bug Bounty: Account Takeover</h3>
-                            <p>OAuth misconfiguration leading to full account takeover. Hall of Fame.</p>
-                            <div class="project-tech">
-                                <span>OAuth</span>
-                                <span>Account Takeover</span>
-                                <span>Microsoft</span>
-                            </div>
-                            <a href="#" style="color:#00f0ff; margin-top:10px; display:inline-block;">Read Write-up →</a>
+                            <h3>Government Infrastructure Audit</h3>
+                            <p>Identified privilege escalation in national security system</p>
+                            <div class="project-tech"><span>AD</span><span>Network</span></div>
                         </div>
-                        <div class="project-bg" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);"></div>
-                    </div>
-                    
-                    <div class="project-card">
-                        <div class="project-overlay">
-                            <h3>AD Privilege Escalation Toolkit</h3>
-                            <p>Open-source tool for automating AD misconfigurations. 500+ GitHub stars.</p>
-                            <div class="project-tech">
-                                <span>Active Directory</span>
-                                <span>Python</span>
-                                <span>Red Teaming</span>
-                            </div>
-                            <a href="#" style="color:#00f0ff; margin-top:10px; display:inline-block;">GitHub Repo →</a>
-                        </div>
-                        <div class="project-bg" style="background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);"></div>
+                        <div class="project-bg" style="background: linear-gradient(135deg, #0f2027, #203a43);"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Tools Section -->
-        <section class="tools" id="tools">
-            <div class="container">
-                <h2 class="section-title">Security Arsenal</h2>
-                <div class="tools-list">
-                    <div class="tool-icon">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Burp Suite Pro</span>
-                    </div>
-                    <div class="tool-icon">
-                        <i class="fas fa-terminal"></i>
-                        <span>Kali Linux</span>
-                    </div>
-                    <div class="tool-icon">
-                        <i class="fas fa-code"></i>
-                        <span>Metasploit</span>
-                    </div>
-                    <div class="tool-icon">
-                        <i class="fas fa-network-wired"></i>
-                        <span>Cobalt Strike</span>
-                    </div>
-                    <div class="tool-icon">
-                        <i class="fas fa-database"></i>
-                        <span>SQLMap</span>
-                    </div>
-                    <div class="tool-icon">
-                        <i class="fas fa-bug"></i>
-                        <span>OWASP ZAP</span>
-                    </div>
-                    <div class="tool-icon">
-                        <i class="fas fa-key"></i>
-                        <span>Hashcat</span>
-                    </div>
-                    <div class="tool-icon">
-                        <i class="fas fa-server"></i>
-                        <span>Wireshark</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section - With Upwork -->
         <section class="contact" id="contact">
             <div class="container">
-                <h2 class="section-title">/connect — Hire Me</h2>
+                <h2 class="section-title">Get In Touch</h2>
                 <div class="contact-content">
                     <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fab fa-upwork"></i>
-                            <div>
-                                <strong>Upwork</strong><br>
-                                <a href="https://www.upwork.com/freelancers/~01abcdefgh" target="_blank" style="color:#00f0ff;">Top Rated Plus Freelancer</a>
-                                <p style="font-size:12px;">100+ jobs | 5.0 rating</p>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fab fa-hacker-news"></i>
-                            <div>
-                                <strong>HackerOne</strong><br>
-                                <a href="https://hackerone.com/websi3" target="_blank" style="color:#00f0ff;">@websi3</a>
-                                <p style="font-size:12px;">Top 1% | $250k+ bounties</p>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fab fa-github"></i>
-                            <div>
-                                <strong>GitHub</strong><br>
-                                <a href="https://github.com/websi3" target="_blank" style="color:#00f0ff;">github.com/websi3</a>
-                                <p style="font-size:12px;">Open-source exploits & tools</p>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <div>
-                                <strong>Secure Contact</strong><br>
-                                <span>Use form →</span>
-                                <p style="font-size:11px;">🔑 PGP Fingerprint: 3A4B 7C9D E2F1 8845 9A2B 6C8D 0E1F 2A3B 4C5D</p>
-                            </div>
-                        </div>
+                        <div class="contact-item"><i class="fab fa-upwork"></i><span>Upwork: Top Rated Plus</span></div>
+                        <div class="contact-item"><i class="fas fa-envelope"></i><span>jubaidhossain365@gmail.com</span></div>
+                        <div class="contact-item"><i class="fab fa-hacker-news"></i><span>HackerOne: websi3</span></div>
+                        <div class="contact-item"><i class="fab fa-github"></i><span>github.com/websi3</span></div>
                     </div>
-                    
                     <form class="contact-form" id="contactForm">
-                        <div class="form-group">
-                            <input type="text" id="userName" placeholder="Your Name" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" id="userEmail" placeholder="Your Email" required>
-                        </div>
-                        <div class="form-group">
-                            <textarea id="userMessage" placeholder="Project details / Confidential disclosure" rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn primary">Send Encrypted Message →</button>
+                        <div class="form-group"><input type="text" id="userName" placeholder="Your Name" required></div>
+                        <div class="form-group"><input type="email" id="userEmail" placeholder="Your Email" required></div>
+                        <div class="form-group"><textarea id="userMessage" placeholder="Your Message" rows="5" required></textarea></div>
+                        <button type="submit" class="btn primary">Send Message</button>
                     </form>
                 </div>
             </div>
         </section>
 
-        <!-- Footer -->
         <footer>
             <div class="container">
-                <p>© 2026 Websi3 | Offensive Security Professional</p>
+                <p>&copy; 2026 Websi3. All rights reserved.</p>
                 <div class="social-links">
                     <a href="#"><i class="fab fa-linkedin-in"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>
                     <a href="#"><i class="fab fa-github"></i></a>
-                    <a href="#"><i class="fab fa-hacker-news"></i></a>
                 </div>
             </div>
         </footer>
     </main>
 
     <script>
-        // ======================
-        // SECURE EMAILJS CONFIG
-        // ======================
-        // IMPORTANT: In production, move these to environment variables
-        // For now, replace with your actual keys from EmailJS dashboard
-        
-        const EMAILJS_PUBLIC_KEY = "MrXLGgk4CNPp4h0oC";  // REPLACE WITH YOUR KEY
-        const EMAILJS_SERVICE_ID = "service_vqe1ue7";   // REPLACE WITH YOUR SERVICE ID
-        const EMAILJS_TEMPLATE_ID = "template_he9cpou"; // REPLACE WITH YOUR TEMPLATE ID
-
-        // Initialize EmailJS
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-
-        // DOM Elements
-        const loadingScreen = document.querySelector('.loading-screen');
-        const cursorFollower = document.querySelector('.cursor-follower');
-        const particlesContainer = document.querySelector('.particles-container');
-        const skillProgressBars = document.querySelectorAll('.skill-progress');
-
-        // Initialize when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
+        // Loading screen
+        setTimeout(() => {
+            document.querySelector('.loading-screen').style.opacity = '0';
             setTimeout(() => {
-                loadingScreen.style.opacity = '0';
-                loadingScreen.style.visibility = 'hidden';
-                setTimeout(initAnimations, 500);
-            }, 2000);
-            
-            createParticles();
-            setupEventListeners();
-            
-            const contactForm = document.getElementById('contactForm');
-            if (contactForm) {
-                contactForm.addEventListener('submit', handleFormSubmit);
-            }
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 800);
+        }, 2000);
+
+        // Particles
+        for(let i = 0; i < 30; i++) {
+            let p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.width = Math.random() * 10 + 2 + 'px';
+            p.style.height = p.style.width;
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.animationDuration = Math.random() * 20 + 10 + 's';
+            p.style.animationDelay = Math.random() * 5 + 's';
+            document.querySelector('.particles-container').appendChild(p);
+        }
+
+        // Cursor
+        document.addEventListener('mousemove', (e) => {
+            document.querySelector('.cursor-follower').style.left = e.clientX + 'px';
+            document.querySelector('.cursor-follower').style.top = e.clientY + 'px';
         });
 
-        // Handle email sending
-        function handleFormSubmit(e) {
+        // Skill animation on scroll
+        window.addEventListener('scroll', () => {
+            document.querySelectorAll('.skill-progress').forEach(bar => {
+                let pos = bar.getBoundingClientRect().top;
+                if(pos < window.innerHeight - 100) {
+                    bar.style.width = bar.parentElement.parentElement.querySelector('.skill-info span:last-child').innerText;
+                }
+            });
+        });
+
+        // EmailJS - if you have valid keys, uncomment this
+        /*
+        emailjs.init("YOUR_PUBLIC_KEY");
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const name = document.getElementById('userName').value;
-            const email = document.getElementById('userEmail').value;
-            const message = document.getElementById('userMessage').value;
-            
-            if (!name.trim() || !email.trim() || !message.trim()) {
-                alert("⚠️ Please fill in all fields.");
-                return;
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert("⚠️ Please enter a valid email address.");
-                return;
-            }
-            
-            const submitBtn = document.querySelector('#contactForm .btn.primary');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = "Sending...";
-            submitBtn.disabled = true;
-            
-            emailjs.send(
-                EMAILJS_SERVICE_ID,
-                EMAILJS_TEMPLATE_ID,
-                {
-                    from_name: name,
-                    from_email: email,
-                    message: message + "\n\n---\nSent from websi3 portfolio"
-                }
-            )
-            .then(function(response) {
-                alert("✅ Message sent securely! I'll reply within 24 hours.");
-                document.getElementById('contactForm').reset();
-            })
-            .catch(function(error) {
-                console.error("EmailJS Error:", error);
-                alert("❌ Failed to send. Please contact directly: admin@websi3.com");
-            })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-        }
-
-        // Particles animation (your existing code)
-        function createParticles() {
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                particle.style.width = `${Math.random() * 10 + 2}px`;
-                particle.style.height = particle.style.width;
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
-                particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
-                particle.style.animationDelay = `${Math.random() * 5}s`;
-                particle.style.backgroundColor = `hsl(${Math.random() * 60}, 100%, 70%)`;
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        function setupEventListeners() {
-            document.addEventListener('mousemove', (e) => {
-                cursorFollower.style.left = `${e.clientX}px`;
-                cursorFollower.style.top = `${e.clientY}px`;
-            });
-        }
-
-        function initAnimations() {
-            window.addEventListener('scroll', animateOnScroll);
-            animateOnScroll();
-        }
-
-        function animateOnScroll() {
-            skillProgressBars.forEach(bar => {
-                const value = bar.getAttribute('data-value');
-                const position = bar.getBoundingClientRect().top;
-                if (position < window.innerHeight / 1.3) {
-                    bar.style.width = `${value}%`;
-                }
-            });
-        }
-
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
+            emailjs.send("SERVICE_ID", "TEMPLATE_ID", {
+                from_name: document.getElementById('userName').value,
+                from_email: document.getElementById('userEmail').value,
+                message: document.getElementById('userMessage').value
+            }).then(() => alert('Message sent!')).catch(() => alert('Failed'));
         });
+        */
     </script>
 </body>
 </html>
